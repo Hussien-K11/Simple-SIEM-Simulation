@@ -1,0 +1,101 @@
+timestamp,event_id,event_type,username,host,logon_type,process_name,privilege_used
+2025-07-21 11:00:00,4625,Logon Failure,guest,WORKSTATION-01,RemoteDesktop,cmd.exe,
+2025-07-21 11:00:13,4688,Process Created,admin,WORKSTATION-01,Network,cmd.exe,
+2025-07-21 11:00:30,4625,Logon Failure,alice,FINANCE-LAPTOP,Interactive,cmd.exe,
+2025-07-21 11:00:54,4672,Privilege Escalation,guest,SERVER-02,RemoteDesktop,chrome.exe,SeDebugPrivilege
+2025-07-21 11:01:12,4672,Privilege Escalation,guest,WORKSTATION-01,Network,explorer.exe,SeDebugPrivilege
+2025-07-21 11:00:55,9999,Mimikatz Execution,charlie,SERVER-02,RemoteDesktop,chrome.exe,SeDebugPrivilege
+2025-07-21 11:02:48,4688,Process Created,guest,FINANCE-LAPTOP,Interactive,rundll32.exe,
+2025-07-21 11:03:30,9999,Mimikatz Execution,guest,FINANCE-LAPTOP,Interactive,cmd.exe,SeDebugPrivilege
+2025-07-21 11:01:28,4625,Logon Failure,alice,HR-PC,RemoteDesktop,explorer.exe,
+2025-07-21 11:03:27,4672,Privilege Escalation,guest,WORKSTATION-01,Interactive,rundll32.exe,SeDebugPrivilege
+2025-07-21 11:02:20,4625,Logon Failure,bob,WORKSTATION-01,Network,mimikatz.exe,
+2025-07-21 11:03:18,4688,Process Created,bob,SERVER-02,RemoteDesktop,svchost.exe,
+2025-07-21 11:02:48,4720,New User Account Created,charlie,WORKSTATION-01,Network,explorer.exe,
+2025-07-21 11:02:49,4625,Logon Failure,charlie,FINANCE-LAPTOP,Interactive,powershell.exe,
+2025-07-21 11:03:16,4672,Privilege Escalation,charlie,WORKSTATION-01,Network,explorer.exe,SeDebugPrivilege
+2025-07-21 11:03:45,4624,Logon Success,charlie,FINANCE-LAPTOP,Network,explorer.exe,
+2025-07-21 11:03:28,4672,Privilege Escalation,guest,WORKSTATION-01,RemoteDesktop,cmd.exe,SeDebugPrivilege
+2025-07-21 11:03:58,4624,Logon Success,guest,WORKSTATION-01,RemoteDesktop,rundll32.exe,
+2025-07-21 11:09:00,4624,Logon Success,admin,WORKSTATION-01,Interactive,explorer.exe,
+2025-07-21 11:03:29,4688,Process Created,alice,WORKSTATION-01,Interactive,chrome.exe,
+2025-07-21 11:07:40,4672,Privilege Escalation,guest,WORKSTATION-01,RemoteDesktop,mimikatz.exe,SeDebugPrivilege
+2025-07-21 11:09:06,9999,Mimikatz Execution,alice,HR-PC,Network,mimikatz.exe,SeDebugPrivilege
+2025-07-21 11:10:16,4720,New User Account Created,alice,WORKSTATION-01,Interactive,cmd.exe,
+2025-07-21 11:07:17,4720,New User Account Created,admin,FINANCE-LAPTOP,Interactive,mimikatz.exe,
+2025-07-21 11:07:36,4688,Process Created,charlie,FINANCE-LAPTOP,RemoteDesktop,explorer.exe,
+2025-07-21 11:11:40,4624,Logon Success,alice,HR-PC,Interactive,rundll32.exe,
+2025-07-21 11:12:08,4624,Logon Success,alice,HR-PC,Interactive,mimikatz.exe,
+2025-07-21 11:08:06,4688,Process Created,charlie,FINANCE-LAPTOP,Network,mimikatz.exe,
+2025-07-21 11:13:32,4672,Privilege Escalation,guest,HR-PC,Network,svchost.exe,SeDebugPrivilege
+2025-07-21 11:13:03,9999,Mimikatz Execution,admin,FINANCE-LAPTOP,RemoteDesktop,powershell.exe,SeDebugPrivilege
+2025-07-21 11:10:00,9999,Mimikatz Execution,admin,FINANCE-LAPTOP,Interactive,rundll32.exe,SeDebugPrivilege
+2025-07-21 11:10:51,4688,Process Created,charlie,WORKSTATION-01,RemoteDesktop,mimikatz.exe,
+2025-07-21 11:13:20,4720,New User Account Created,alice,HR-PC,Interactive,mimikatz.exe,
+2025-07-21 11:08:15,9999,Mimikatz Execution,guest,SERVER-02,RemoteDesktop,powershell.exe,SeDebugPrivilege
+2025-07-21 11:09:38,4720,New User Account Created,guest,SERVER-02,Interactive,svchost.exe,
+2025-07-21 11:06:25,4624,Logon Success,guest,FINANCE-LAPTOP,Interactive,svchost.exe,
+2025-07-21 11:16:12,4720,New User Account Created,bob,WORKSTATION-01,Network,mimikatz.exe,
+2025-07-21 11:18:30,4672,Privilege Escalation,guest,FINANCE-LAPTOP,Network,explorer.exe,SeDebugPrivilege
+2025-07-21 11:06:20,4672,Privilege Escalation,admin,WORKSTATION-01,RemoteDesktop,powershell.exe,SeDebugPrivilege
+2025-07-21 11:14:57,4624,Logon Success,charlie,SERVER-02,Interactive,rundll32.exe,
+2025-07-21 11:07:20,4688,Process Created,bob,SERVER-02,Network,svchost.exe,
+2025-07-21 11:08:12,9999,Mimikatz Execution,bob,FINANCE-LAPTOP,Network,rundll32.exe,SeDebugPrivilege
+2025-07-21 11:15:24,4625,Logon Failure,charlie,HR-PC,Interactive,rundll32.exe,
+2025-07-21 11:07:53,4624,Logon Success,guest,WORKSTATION-01,Interactive,svchost.exe,
+2025-07-21 11:15:24,4624,Logon Success,admin,FINANCE-LAPTOP,Interactive,chrome.exe,
+2025-07-21 11:17:15,4672,Privilege Escalation,bob,HR-PC,RemoteDesktop,chrome.exe,SeDebugPrivilege
+2025-07-21 11:18:24,9999,Mimikatz Execution,guest,HR-PC,RemoteDesktop,chrome.exe,SeDebugPrivilege
+2025-07-21 11:08:37,4688,Process Created,admin,HR-PC,Interactive,explorer.exe,
+2025-07-21 11:14:24,4625,Logon Failure,admin,FINANCE-LAPTOP,Interactive,svchost.exe,
+2025-07-21 11:13:04,4624,Logon Success,alice,SERVER-02,Network,powershell.exe,
+2025-07-21 11:21:40,4672,Privilege Escalation,guest,FINANCE-LAPTOP,Interactive,explorer.exe,SeDebugPrivilege
+2025-07-21 11:23:48,4688,Process Created,guest,WORKSTATION-01,Interactive,explorer.exe,
+2025-07-21 11:11:16,9999,Mimikatz Execution,bob,HR-PC,Interactive,rundll32.exe,SeDebugPrivilege
+2025-07-21 11:10:36,4624,Logon Success,admin,WORKSTATION-01,RemoteDesktop,chrome.exe,
+2025-07-21 11:24:18,4688,Process Created,guest,FINANCE-LAPTOP,RemoteDesktop,powershell.exe,
+2025-07-21 11:16:30,4688,Process Created,bob,FINANCE-LAPTOP,Interactive,chrome.exe,
+2025-07-21 11:14:00,4624,Logon Success,charlie,FINANCE-LAPTOP,RemoteDesktop,powershell.exe,
+2025-07-21 11:15:12,4672,Privilege Escalation,alice,FINANCE-LAPTOP,Network,svchost.exe,SeDebugPrivilege
+2025-07-21 11:19:20,9999,Mimikatz Execution,admin,FINANCE-LAPTOP,Network,rundll32.exe,SeDebugPrivilege
+2025-07-21 11:12:47,4624,Logon Success,alice,HR-PC,Network,chrome.exe,
+2025-07-21 11:27:00,4672,Privilege Escalation,guest,HR-PC,Network,cmd.exe,SeDebugPrivilege
+2025-07-21 11:21:21,4625,Logon Failure,bob,HR-PC,Interactive,mimikatz.exe,
+2025-07-21 11:29:58,4624,Logon Success,admin,WORKSTATION-01,Interactive,explorer.exe,
+2025-07-21 11:30:27,4672,Privilege Escalation,charlie,SERVER-02,Network,svchost.exe,SeDebugPrivilege
+2025-07-21 11:11:44,4720,New User Account Created,charlie,FINANCE-LAPTOP,Interactive,rundll32.exe,
+2025-07-21 11:23:50,4672,Privilege Escalation,admin,HR-PC,Network,chrome.exe,SeDebugPrivilege
+2025-07-21 11:20:54,4672,Privilege Escalation,alice,HR-PC,Network,chrome.exe,SeDebugPrivilege
+2025-07-21 11:20:06,4625,Logon Failure,guest,HR-PC,RemoteDesktop,rundll32.exe,
+2025-07-21 11:17:00,4720,New User Account Created,admin,HR-PC,Interactive,chrome.exe,
+2025-07-21 11:20:42,9999,Mimikatz Execution,alice,HR-PC,Network,explorer.exe,SeDebugPrivilege
+2025-07-21 11:33:50,4672,Privilege Escalation,admin,SERVER-02,Network,mimikatz.exe,SeDebugPrivilege
+2025-07-21 11:23:40,9999,Mimikatz Execution,alice,FINANCE-LAPTOP,Interactive,powershell.exe,SeDebugPrivilege
+2025-07-21 11:15:36,4720,New User Account Created,charlie,SERVER-02,Network,explorer.exe,
+2025-07-21 11:25:33,4688,Process Created,alice,WORKSTATION-01,RemoteDesktop,chrome.exe,
+2025-07-21 11:35:46,4625,Logon Failure,alice,SERVER-02,Interactive,powershell.exe,
+2025-07-21 11:21:15,4672,Privilege Escalation,guest,HR-PC,Interactive,chrome.exe,SeDebugPrivilege
+2025-07-21 11:19:00,9999,Mimikatz Execution,guest,FINANCE-LAPTOP,Network,rundll32.exe,SeDebugPrivilege
+2025-07-21 11:34:39,4625,Logon Failure,charlie,HR-PC,RemoteDesktop,explorer.exe,
+2025-07-21 11:14:18,9999,Mimikatz Execution,admin,WORKSTATION-01,Interactive,explorer.exe,SeDebugPrivilege
+2025-07-21 11:30:17,9999,Mimikatz Execution,admin,HR-PC,Network,cmd.exe,SeDebugPrivilege
+2025-07-21 11:17:20,4688,Process Created,alice,SERVER-02,Interactive,explorer.exe,
+2025-07-21 11:17:33,4688,Process Created,bob,WORKSTATION-01,Network,powershell.exe,
+2025-07-21 11:31:26,4688,Process Created,charlie,WORKSTATION-01,Interactive,svchost.exe,
+2025-07-21 11:33:12,9999,Mimikatz Execution,charlie,FINANCE-LAPTOP,RemoteDesktop,rundll32.exe,SeDebugPrivilege
+2025-07-21 11:29:24,4720,New User Account Created,alice,HR-PC,Interactive,explorer.exe,
+2025-07-21 11:22:40,4688,Process Created,admin,HR-PC,RemoteDesktop,chrome.exe,
+2025-07-21 11:34:24,4624,Logon Success,alice,HR-PC,Network,chrome.exe,
+2025-07-21 11:42:03,4625,Logon Failure,bob,HR-PC,RemoteDesktop,powershell.exe,
+2025-07-21 11:44:00,4688,Process Created,guest,FINANCE-LAPTOP,RemoteDesktop,mimikatz.exe,
+2025-07-21 11:44:30,9999,Mimikatz Execution,bob,SERVER-02,Network,svchost.exe,SeDebugPrivilege
+2025-07-21 11:27:00,4688,Process Created,admin,WORKSTATION-01,RemoteDesktop,powershell.exe,
+2025-07-21 11:25:47,9999,Mimikatz Execution,admin,WORKSTATION-01,RemoteDesktop,powershell.exe,SeDebugPrivilege
+2025-07-21 11:46:00,4625,Logon Failure,bob,HR-PC,Network,rundll32.exe,
+2025-07-21 11:37:12,4672,Privilege Escalation,guest,WORKSTATION-01,Network,svchost.exe,SeDebugPrivilege
+2025-07-21 11:32:54,9999,Mimikatz Execution,guest,SERVER-02,Interactive,chrome.exe,SeDebugPrivilege
+2025-07-21 11:33:15,4688,Process Created,admin,SERVER-02,Interactive,svchost.exe,
+2025-07-21 11:32:00,4672,Privilege Escalation,guest,FINANCE-LAPTOP,Interactive,rundll32.exe,SeDebugPrivilege
+2025-07-21 11:35:34,9999,Mimikatz Execution,charlie,HR-PC,RemoteDesktop,rundll32.exe,SeDebugPrivilege
+2025-07-21 11:31:02,4688,Process Created,bob,WORKSTATION-01,Network,powershell.exe,
+2025-07-21 11:37:57,4672,Privilege Escalation,charlie,SERVER-02,RemoteDesktop,explorer.exe,SeDebugPrivilege
