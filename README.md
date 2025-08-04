@@ -42,11 +42,19 @@ To reduce noise, we also filter for DNS response codes like `NXDOMAIN` or `SERVF
 - Match base64-style domains using regex
 - Filter only failed DNS lookups to reduce false positives
 
-**Screenshots:**
-![Preview of raw DNS logs](screenshots/jupyter/dns/dns_logs_preview.png)  
-![Suspicious queries - part 1](screenshots/jupyter/dns/dns_rule1_suspicious_queries(1).png)  
-![Suspicious queries - part 2](screenshots/jupyter/dns/dns_rule1_suspicious_queries(2).png)
+<details>
+<summary>View DNS Rule 1 Screenshots</summary>
 
+_Preview of Raw DNS Logs_  
+![Preview](screenshots/jupyter/dns/dns_logs_preview.png)
+
+_Suspicious Queries (Part 1)_  
+![Part 1](screenshots/jupyter/dns/dns_rule1_suspicious_queries(1).png)
+
+_Suspicious Queries (Part 2)_  
+![Part 2](screenshots/jupyter/dns/dns_rule1_suspicious_queries(2).png)
+
+</details>
 
 </details>
 
