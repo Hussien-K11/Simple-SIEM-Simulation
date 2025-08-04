@@ -43,9 +43,10 @@ To reduce noise, we also filter for DNS response codes like `NXDOMAIN` or `SERVF
 - Filter only failed DNS lookups to reduce false positives
 
 **Screenshots:**
-- [dns_logs_preview.png](./screenshots/dns_logs_preview.png)
-- [dns_rule1_suspicious_queries(1).png](./screenshots/dns_rule1_suspicious_queries(1).png)
-- [dns_rule1_suspicious_queries(2).png](./screenshots/dns_rule1_suspicious_queries(2).png)
+![Preview of raw DNS logs](screenshots/jupyter/dns/dns_logs_preview.png)  
+![Suspicious queries - part 1](screenshots/jupyter/dns/dns_rule1_suspicious_queries(1).png)  
+![Suspicious queries - part 2](screenshots/jupyter/dns/dns_rule1_suspicious_queries(2).png)
+
 
 </details>
 
