@@ -88,10 +88,10 @@ _Preview of Raw Windows Logs_
 ![Preview](screenshots/jupyter/windows/windows_logs_preview.png)
 
 _Detection Logic (Part 1)_  
-![Logic](screenshots/jupyter/windows/windows_rule1_suspicious_process_logic(1).png)
+![Logic](screenshots/jupyter/windows/windows_rule1_logic.png)
 
 _Detection Output (Part 2)_  
-![Output](screenshots/jupyter/windows/windows_rule1_suspicious_process_output(2).png)
+![Output](screenshots/jupyter/windows/windows_rule1_output.png)
 
 </details>
 
