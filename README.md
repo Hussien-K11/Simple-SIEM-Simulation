@@ -69,7 +69,34 @@ _Suspicious Queries (Part 2)_
 | 2 | _Planned: Event ID 4625 (failed logins) correlation_ |
 | 3 | _Planned: Privilege escalation via unusual logon type and process combo_ |
 
-_(Detection logic under development. Will include correlation of process names, event IDs, and privilege usage patterns for insider threat simulation.)_
+<details>
+<summary>Rule 1 – Suspicious Parent-Child Process Execution</summary>
+
+**Analyst Note:**  
+This detection flags potentially malicious behaviour where a trusted parent process (like `explorer.exe`, `winword.exe`, or `outlook.exe`) spawns suspicious child processes such as `powershell.exe`, `cmd.exe`, or `certutil.exe`. These combinations often indicate post-exploitation activity, phishing payloads, or living-off-the-land (LOLBins) abuse.
+
+**Logic Summary:**
+- Create a simulated `parent_process` column (real-world logs should contain this field)
+- Convert all process names to lowercase for reliable comparison
+- Filter rows where the parent is trusted and child is suspicious
+- Alert if any such parent-child pair is found
+
+<details>
+<summary>View Windows Rule 1 Screenshots</summary>
+
+_Preview of Raw Windows Logs_  
+![Preview](screenshots/jupyter/windows/windows_logs_preview.png)
+
+_Detection Logic (Part 1)_  
+![Logic](screenshots/jupyter/windows/windows_rule1_suspicious_process_logic(1).png)
+
+_Detection Output (Part 2)_  
+![Output](screenshots/jupyter/windows/windows_rule1_suspicious_process_output(2).png)
+
+</details>
+
+</details>
+
 
 ---
 
