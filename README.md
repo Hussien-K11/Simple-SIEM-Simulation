@@ -97,6 +97,31 @@ _Detection Output (Part 2)_
 
 </details>
 
+---
+
+<details>
+<summary>Rule 2 – Repeated Failed Logins from Same Host</summary>
+
+**Analyst Note:**  
+This rule identifies brute-force style activity by detecting multiple failed login attempts from the same host within a short time window. Using Event ID 4625 (failed logons), it simulates detection of account compromise attempts and poor password hygiene.
+
+**Logic Summary:**
+- Filter Event ID 4625 from Windows logs
+- Group events by `host`
+- Trigger alert if 5+ failed logins occur within 2 minutes
+
+<details>
+<summary>View Windows Rule 2 Screenshots</summary>
+
+_Detection Logic_  
+![Logic](screenshots/jupyter/windows/windows_rule2_failed_logins_logic.png)
+
+_Detection Output_  
+![Output](screenshots/jupyter/windows/windows_rule2_failed_logins_output.png)
+
+</details>
+
+</details>
 
 ---
 
