@@ -97,8 +97,6 @@ _Detection Output (Part 2)_
 
 </details>
 
----
-
 <details>
 <summary>Rule 2 – Repeated Failed Logins from Same Host</summary>
 
