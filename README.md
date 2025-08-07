@@ -121,6 +121,33 @@ _Detection Output_
 
 </details>
 
+<details>
+<summary>Rule 3 – Privilege Escalation Detection (Event ID 4672)</summary>
+
+**Analyst Note:**  
+This rule identifies suspicious privilege escalation events by filtering for `event_id` 4672 (special privileges assigned) and correlating it with usernames and hostnames that typically shouldn’t perform elevated actions (e.g. `guest`, `test`, `svc_account`, or HR/Finance endpoints). This aligns with post-exploitation behaviour like privilege abuse.
+
+**Logic Summary:**
+- Filter logs for `event_id` 4672
+- Flag events where:
+  - The username is suspicious (e.g. guest, test, etc.)
+  - The host is unusual (e.g. HR-PC, FINANCE-LAPTOP)
+- Display timestamp, user, host, and privilege used
+
+<details>
+<summary>View Windows Rule 3 Screenshots</summary>
+
+_Detection Logic_  
+![Logic](screenshots/jupyter/windows/windows_rule3_privilege_escalation_logic.png)
+
+_Detection Output_  
+![Output](screenshots/jupyter/windows/windows_rule3_privilege_escalation_output.png)
+
+</details>
+
+</details>
+
+
 ---
 
 ## 5. Authentication Log Detections  
