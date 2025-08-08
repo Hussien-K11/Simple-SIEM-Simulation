@@ -38,7 +38,7 @@ This section showcases detection rules written in Python using Jupyter notebooks
 ---
 
 ### Rule 1 – Suspicious DNS Query Detection  
-Attackers often rely on DNS for command-and-control or data staging. This rule focuses on failed or randomised DNS queries that resemble malware beaconing activity.
+This rule flags DNS traffic that resembles beaconing or C2 activity. It targets base64-style strings, shady top-level domains, and failed lookups that don’t belong in typical user traffic.
 
 <details>
 <summary>See how this rule works, why it matters, and what it looks like in action</summary>
@@ -71,7 +71,8 @@ _Suspicious Queries (Part 2)_
 </details>
 </details>
 
-<details>
+</details>
+
 ---
 
 
