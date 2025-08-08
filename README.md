@@ -25,6 +25,7 @@ The project reflects Tier 1 SOC responsibilities such as:
 This section showcases detection rules written in Python using Jupyter notebooks. Each rule is designed to reflect real-world SOC workflows: reviewing logs, applying logic, filtering out noise, and flagging suspicious behaviour. Every rule is aligned with adversary techniques from the MITRE ATT&CK framework, mapped to NIST CSF functions, and rooted in practical detection goals from CIS Controls.
 
 ---
+---
 
 <details>
 <summary><strong>DNS Log Detections</strong> — <em>Data Source: dns_logs.csv</em></summary>
