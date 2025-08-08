@@ -38,13 +38,13 @@ This section showcases detection rules written in Python using Jupyter notebooks
 ---
 
 ### Rule 1 – Suspicious DNS Query Detection  
-This rule flags unusual domain requests that resemble command-and-control behaviour. It focuses on randomised strings, strange TLDs, and failed DNS resolutions — a pattern common in malware beaconing.
+Attackers often rely on DNS for command-and-control or data staging. This rule focuses on failed or randomised DNS queries that resemble malware beaconing activity.
 
 <details>
 <summary>See how this rule works, why it matters, and what it looks like in action</summary>
 
 **Analyst Note:**  
-I wanted this rule to flag potential beaconing or command-and-control activity, but not every strange-looking domain is malicious. I used regex to match domains that resembled base64 or randomised strings, then filtered for uncommon TLDs like `.ru` or `.xyz`. To reduce noise, I added a check for DNS response codes like `NXDOMAIN` and `SERVFAIL`, which often appear in failed malware lookups. This helped me practise fine-tuning detection rules to balance coverage and precision.
+I built this rule to detect domains that just don’t belong in regular business traffic. I was especially looking for signs of malware beaconing, like encoded strings in the subdomain or uncommon top-level domains such as `.ru` or `.xyz`. I added an extra filter to catch failed lookups (`NXDOMAIN`, `SERVFAIL`) to cut out noise from valid requests. This gave me hands-on practice designing logic that can reduce false positives while still catching high-risk patterns.
 
 **Framework Reference:**  
 - **MITRE ATT&CK T1071.004** – Application Layer Protocol: DNS  
@@ -52,9 +52,9 @@ I wanted this rule to flag potential beaconing or command-and-control activity, 
 - **CIS Control 13.8** – Monitor and alert on anomalous DNS activity
 
 **Logic Summary:**
-- Use regex to identify encoded or random-looking domains  
-- Match against high-risk TLDs  
-- Filter for DNS failures such as `NXDOMAIN` and `SERVFAIL`
+- Use regex to detect base64-style or randomised subdomains  
+- Flag risky TLDs like `.ru`, `.xyz`, `.top`  
+- Filter for failed DNS response codes such as `NXDOMAIN` and `SERVFAIL`
 
 <details>
 <summary>View DNS Rule 1 Screenshots</summary>
@@ -71,9 +71,8 @@ _Suspicious Queries (Part 2)_
 </details>
 </details>
 
-</details>
-
 ---
+
 
 
 <details>
@@ -88,23 +87,23 @@ _Suspicious Queries (Part 2)_
 ---
 
 ### Rule 1 – Suspicious Parent-Child Process Execution  
-Phishing payloads often abuse trusted parent apps like Word or Explorer to silently spawn PowerShell or CertUtil. This detection highlights that relationship and flags it early, before the attack progresses.
+Some phishing payloads abuse trusted parent apps like Word or Explorer to silently spawn dangerous tools like PowerShell. This rule detects that abuse chain before the attacker can escalate.
 
 <details>
 <summary>See how this rule works, why it matters, and what it looks like in action</summary>
 
 **Analyst Note:**  
-This rule was inspired by phishing incidents where Word or Explorer silently launches PowerShell. Since my logs didn’t include a `parent_process` field, I simulated one and filtered for suspicious child processes launched by trusted applications. This helped me practise detecting post-exploitation activity by analysing process lineage.
+This detection was based on real attack patterns I’ve studied, where phishing attachments trigger PowerShell from Word or Outlook. My log source didn’t include the `parent_process` field, so I simulated it using synthetic test data. I then wrote logic to catch trusted parent apps launching suspicious child processes like `powershell.exe`, `cmd.exe`, or `certutil.exe`. This helped me understand how process lineage can expose attacker behaviour that would otherwise slip past basic IOC matching.
 
 **Framework Reference:**  
 - **MITRE ATT&CK T1059** – Command and Scripting Interpreter  
-- **NIST CSF DE.AE-2**, **NIST 800-61 Step 2.2** – Monitor suspicious process chains  
-- **CIS Control 8.7** – Unexpected command-line execution
+- **NIST CSF DE.AE-2**, **NIST 800-61 Step 2.2** – Detect abnormal process chains  
+- **CIS Control 8.7** – Alert on unexpected command-line execution
 
 **Logic Summary:**
-- Simulate `parent_process` field  
-- Flag suspicious child processes such as PowerShell or CertUtil  
-- Detect when trusted apps like `explorer.exe` launch them
+- Simulate a `parent_process` column  
+- Convert process names to lowercase for consistent matching  
+- Filter for cases where trusted apps (e.g. `explorer.exe`, `winword.exe`) launch high-risk processes (`powershell.exe`, `certutil.exe`, etc.)
 
 <details>
 <summary>View Windows Rule 1 Screenshots</summary>
@@ -124,22 +123,22 @@ _Detection Output_
 ---
 
 ### Rule 2 – Repeated Failed Logins from Same Host  
-This rule simulates a brute-force attack by identifying five or more failed login attempts from the same host within two minutes. It captures suspicious behaviour that may go undetected without event correlation.
+Attackers often attempt password guessing by repeatedly submitting incorrect credentials from a single endpoint. This rule flags five or more failed logins from the same host within a short time window.
 
 <details>
 <summary>See how this rule works, why it matters, and what it looks like in action</summary>
 
 **Analyst Note:**  
-I created this rule to simulate brute-force login patterns. After testing different thresholds, I selected a two-minute window to balance effectiveness and reduce false positives. This rule helped me practise grouping events by time and source, which is key to writing meaningful detections.
+I built this rule to simulate brute-force login detection using Event ID 4625. I tested several thresholds and decided that five failures in two minutes was aggressive enough to catch real threats without overwhelming the SOC with noise. It taught me how to group events by host and time to simulate basic correlation — a key skill in detection engineering and alert tuning.
 
 **Framework Reference:**  
 - **MITRE ATT&CK T1110.001** – Password Guessing  
-- **NIST CSF DE.AE-1**, **CIS Control 16.11** – Detect repeated login failures
+- **NIST CSF DE.AE-1**, **CIS Control 16.11** – Detect excessive failed logins from the same source
 
 **Logic Summary:**
-- Filter for Event ID 4625  
-- Group by `host` and sort by time  
-- Trigger an alert when five or more failures occur within two minutes
+- Filter Windows logs for `event_id` 4625 (failed logon)  
+- Group events by `host` and sort chronologically  
+- Trigger alert if five or more failures occur within two minutes
 
 <details>
 <summary>View Windows Rule 2 Screenshots</summary>
@@ -154,6 +153,7 @@ _Detection Output_
 </details>
 
 ---
+
 
 ### Rule 3 – Privilege Escalation Detection (Event ID 4672)  
 This rule flags when high-level privileges are assigned to low-trust accounts or machines. It highlights potential lateral movement or misuse after initial access.
@@ -198,67 +198,91 @@ _Detection Output_
 | 2 | 5+ unique usernames attempted from same IP within 60 seconds |
 | 3 | Successful login after multiple failures from same IP in 10 minutes |
 
+---
+
+### Rule 1 – Brute-Force Login Detection  
+This rule catches vertical brute-force attacks, where a single IP repeatedly attempts to log in within a short window. It reflects a high-confidence pattern that most SOCs monitor closely.
+
 <details>
-<summary>Rule 1 – Brute-Force Login Detection</summary>
+<summary>See how this rule works, why it matters, and what it looks like in action</summary>
 
 **Analyst Note:**  
-This was the first detection I built in this series, and I wanted it to be simple but SOC-relevant. I grouped failed logins by IP and time window, using logic similar to what you’d expect in Splunk or Sentinel. It was important to make this rule sensitive enough to catch attacks, but not trigger on normal failed attempts.
+This was the first detection I built for this project. I grouped failed logins by IP address within a one-minute window, simulating how SIEM tools like Splunk or Sentinel handle brute-force detection. I tested multiple thresholds before settling on five attempts in 60 seconds, which felt realistic for spotting early-stage attacks without flooding the SOC with false positives.
 
 **Framework Reference:**  
 - **MITRE ATT&CK T1110.001** – Brute Force  
-- **NIST CSF DE.AE-3**, **CIS Control 16.11**
+- **NIST CSF DE.AE-3**, **CIS Control 16.11** – Detect excessive failed authentication attempts
 
 **Logic Summary:**
-- Filter for 'FAIL' logins  
-- Group by IP and sort by time  
-- Trigger alert if 5+ failed attempts in 60 seconds
+- Filter logins with status ‘FAIL’  
+- Group by source IP and sort chronologically  
+- Alert if 5 or more attempts occur in under 60 seconds
 
-**Screenshot:**  
+<details>
+<summary>View Authentication Rule 1 Screenshots</summary>
+
 _Add screenshot: `auth_rule1_bruteforce_output.png`_
 
 </details>
+</details>
+
+---
+
+### Rule 2 – Password Spraying Detection  
+Unlike brute-force attacks, this rule detects horizontal attempts where many usernames are targeted from a single IP. It reflects stealthier behaviour designed to avoid account lockouts.
 
 <details>
-<summary>Rule 2 – Password Spraying Detection</summary>
+<summary>See how this rule works, why it matters, and what it looks like in action</summary>
 
 **Analyst Note:**  
-This rule helps catch horizontal attacks where attackers cycle through many usernames. Instead of failed logins from one account, I flipped the logic to count distinct usernames. It’s a good example of spotting pattern abuse that’s intentionally quiet.
+I designed this rule to detect password spraying, which avoids triggering lockouts by spreading login attempts across multiple usernames. It required a shift in thinking compared to Rule 1. Instead of counting raw login failures, I focused on unique usernames within a 60-second period. This helped me practise recognising slower, stealthier attacks that are easy to miss.
 
 **Framework Reference:**  
 - **MITRE ATT&CK T1110.003** – Password Spraying  
-- **CIS Control 16.12** – Detect excessive username attempts
+- **CIS Control 16.12** – Detect excessive username attempts from a single source
 
 **Logic Summary:**
-- Count unique usernames per IP  
-- Trigger alert if 5+ usernames in under 60 seconds
+- Group events by source IP  
+- Count distinct usernames per IP within 60 seconds  
+- Alert when five or more usernames are targeted
 
-**Screenshot:**  
+<details>
+<summary>View Authentication Rule 2 Screenshots</summary>
+
 _Add screenshot: `auth_rule2_passwordspray_output.png`_
 
 </details>
+</details>
+
+---
+
+### Rule 3 – Success After Failures  
+This rule identifies a successful login that follows a burst of failed attempts from the same IP. It’s a strong signal of potential compromise, often missed unless correlation is applied.
 
 <details>
-<summary>Rule 3 – Success After Failures</summary>
+<summary>See how this rule works, why it matters, and what it looks like in action</summary>
 
 **Analyst Note:**  
-This was the most interesting rule to build. It mimics the real scenario where attackers get in *after* repeated failures. I used a time window of 10 minutes and correlated successes with previous fails — a pattern often missed unless you're doing proper log correlation.
+This was the most insightful rule to build. It models a realistic compromise where an attacker guesses the right credentials after a series of failed attempts. I used a 10-minute time window to link successful logins with recent failures from the same IP. It helped me understand how context-aware detection can uncover threats traditional tools might miss.
 
 **Framework Reference:**  
 - **MITRE ATT&CK T1078.004** – Valid Accounts: Cloud Accounts  
-- **NIST SP 800-61 Step 2.4**, **CIS Control 16.13**
+- **NIST SP 800-61 Step 2.4**, **CIS Control 16.13** – Monitor successful authentication after repeated failure
 
 **Logic Summary:**
-- Look for successful logins  
-- Check if they follow ≥3 failures from the same IP within 10 minutes  
-- Flag for escalation or deeper triage
+- Detect successful login attempts  
+- Correlate with prior failed attempts from the same IP  
+- Trigger if three or more failures occurred in the last 10 minutes
 
-**Screenshot:**  
+<details>
+<summary>View Authentication Rule 3 Screenshots</summary>
+
 _Add screenshot: `auth_rule3_success_after_fail.png`_
 
 </details>
-
 </details>
 
+</details>
 
 ---
 
