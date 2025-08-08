@@ -74,8 +74,7 @@ _Suspicious Queries (Part 2)_
 </details>
 
 ---
-
-
+---
 
 <details>
 <summary><strong>Windows Log Detections</strong> — <em>Data Source: windows_logs.csv</em></summary>
@@ -156,24 +155,23 @@ _Detection Output_
 
 ---
 
-
 ### Rule 3 – Privilege Escalation Detection (Event ID 4672)  
-This rule flags when high-level privileges are assigned to low-trust accounts or machines. It highlights potential lateral movement or misuse after initial access.
+Abusing admin privileges after gaining access is a common tactic in lateral movement. This detection surfaces those actions when they originate from suspicious users or endpoints.
 
 <details>
 <summary>See how this rule works, why it matters, and what it looks like in action</summary>
 
 **Analyst Note:**  
-Privilege escalation is a major concern during an attack. I designed this rule to detect Event ID 4672 being triggered by accounts like `guest` or `test`, or by endpoints that are not usually involved in administrative activity. It was useful for learning how to model post-compromise scenarios based on endpoint and identity context.
+I designed this rule to detect high-privilege activity where it doesn't belong. Event ID 4672 logs special privilege assignments, so I used that as the foundation and filtered for low-trust usernames like `guest` or `svc_account`, along with hosts that typically shouldn't request elevated access. It helped me simulate real-world post-exploitation behaviour — and reinforced how valuable user and device context can be in detection logic.
 
 **Framework Reference:**  
 - **MITRE ATT&CK T1078.003** – Valid Accounts: Local Accounts  
-- **NIST 800-61 Step 2.3**, **CIS Control 4.8** – Detect unusual privileged access
+- **NIST 800-61 Step 2.3**, **CIS Control 4.8** – Monitor for unusual privileged account activity
 
 **Logic Summary:**
-- Filter for Event ID 4672  
-- Flag events where users or hosts appear suspicious  
-- Display key metadata like username, host, and assigned privileges
+- Filter for Event ID 4672 (special privileges assigned)  
+- Flag events triggered by suspicious accounts or non-admin endpoints  
+- Output metadata such as timestamp, username, host, and privileges granted
 
 <details>
 <summary>View Windows Rule 3 Screenshots</summary>
@@ -187,7 +185,7 @@ _Detection Output_
 </details>
 </details>
 
-</details>
+---
 
 ---
 
