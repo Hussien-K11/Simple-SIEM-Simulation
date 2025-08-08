@@ -121,6 +121,7 @@ _Detection Output_
 </details>
 </details>
 
+
 ---
 
 ### Rule 2 – Repeated Failed Logins from Same Host  
@@ -185,6 +186,7 @@ _Detection Output_
 </details>
 </details>
 
+</details>
 ---
 
 ---
