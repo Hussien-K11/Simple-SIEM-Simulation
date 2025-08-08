@@ -79,21 +79,26 @@ _Suspicious Queries (Part 2)_
 | 2 | Repeated failed logins (Event ID 4625) |
 | 3 | Privilege escalation attempts (Event ID 4672) |
 
+---
+
+### Rule 1 – Suspicious Parent-Child Process Execution  
+Phishing payloads often abuse trusted parent apps like Word or Explorer to silently spawn PowerShell or CertUtil. This detection highlights that relationship and flags it early, before the attack progresses.
+
 <details>
-<summary>Rule 1 – Suspicious Parent-Child Process Execution</summary>
+<summary>See how this rule works, why it matters, and what it looks like in action</summary>
 
 **Analyst Note:**  
-This rule was inspired by real-world phishing cases where Word or Explorer silently launches PowerShell. Since my log data didn’t have a built-in parent process field, I simulated it — then filtered for dangerous child processes coming from apps that normally shouldn’t launch them. This helped me practise detecting LOLBins and post-exploitation behaviour.
+This rule was inspired by phishing incidents where Word or Explorer silently launches PowerShell. Since my logs didn’t include a `parent_process` field, I simulated one and filtered for suspicious child processes launched by trusted applications. This helped me practise detecting post-exploitation activity by analysing process lineage.
 
 **Framework Reference:**  
 - **MITRE ATT&CK T1059** – Command and Scripting Interpreter  
-- **NIST CSF DE.AE-2**, **NIST 800-61 Step 2.2** – Monitor for suspicious process chains  
-- **CIS Control 8.7** – Alert on unexpected command-line activity
+- **NIST CSF DE.AE-2**, **NIST 800-61 Step 2.2** – Monitor suspicious process chains  
+- **CIS Control 8.7** – Unexpected command-line execution
 
 **Logic Summary:**
-- Simulate `parent_process` column  
-- Match suspicious child processes (PowerShell, CertUtil, etc.)  
-- Filter for trusted parent apps like `explorer.exe` and `winword.exe`
+- Simulate `parent_process` field  
+- Flag suspicious child processes such as PowerShell or CertUtil  
+- Detect when trusted apps like `explorer.exe` launch them
 
 <details>
 <summary>View Windows Rule 1 Screenshots</summary>
@@ -110,11 +115,16 @@ _Detection Output_
 </details>
 </details>
 
+---
+
+### Rule 2 – Repeated Failed Logins from Same Host  
+This rule simulates a brute-force attack by identifying five or more failed login attempts from the same host within two minutes. It captures suspicious behaviour that may go undetected without event correlation.
+
 <details>
-<summary>Rule 2 – Repeated Failed Logins from Same Host</summary>
+<summary>See how this rule works, why it matters, and what it looks like in action</summary>
 
 **Analyst Note:**  
-I built this rule to simulate brute-force detection using Event ID 4625. I tested different time windows and landed on 2 minutes as a balance between catching bad behaviour and avoiding alert fatigue. It was a good exercise in grouping, timestamp filtering, and simulating correlation logic you’d expect in a real SIEM.
+I created this rule to simulate brute-force login patterns. After testing different thresholds, I selected a two-minute window to balance effectiveness and reduce false positives. This rule helped me practise grouping events by time and source, which is key to writing meaningful detections.
 
 **Framework Reference:**  
 - **MITRE ATT&CK T1110.001** – Password Guessing  
@@ -122,8 +132,8 @@ I built this rule to simulate brute-force detection using Event ID 4625. I teste
 
 **Logic Summary:**
 - Filter for Event ID 4625  
-- Group by `host` and sort by timestamp  
-- Alert if 5+ failed logins occur within 2 minutes
+- Group by `host` and sort by time  
+- Trigger an alert when five or more failures occur within two minutes
 
 <details>
 <summary>View Windows Rule 2 Screenshots</summary>
@@ -137,20 +147,25 @@ _Detection Output_
 </details>
 </details>
 
+---
+
+### Rule 3 – Privilege Escalation Detection (Event ID 4672)  
+This rule flags when high-level privileges are assigned to low-trust accounts or machines. It highlights potential lateral movement or misuse after initial access.
+
 <details>
-<summary>Rule 3 – Privilege Escalation Detection (Event ID 4672)</summary>
+<summary>See how this rule works, why it matters, and what it looks like in action</summary>
 
 **Analyst Note:**  
-I wanted this rule to catch unexpected use of high privileges — something often overlooked until it’s too late. By flagging Event ID 4672 from usernames or systems that shouldn’t have admin access, this detection simulates how a SOC might spot lateral movement or privilege misuse in a post-compromise scenario.
+Privilege escalation is a major concern during an attack. I designed this rule to detect Event ID 4672 being triggered by accounts like `guest` or `test`, or by endpoints that are not usually involved in administrative activity. It was useful for learning how to model post-compromise scenarios based on endpoint and identity context.
 
 **Framework Reference:**  
 - **MITRE ATT&CK T1078.003** – Valid Accounts: Local Accounts  
-- **NIST 800-61 Step 2.3**, **CIS Control 4.8** – Detect unusual privileged account usage
+- **NIST 800-61 Step 2.3**, **CIS Control 4.8** – Detect unusual privileged access
 
 **Logic Summary:**
 - Filter for Event ID 4672  
-- Flag suspicious usernames (e.g. guest, test) or hosts (e.g. HR-PC, FINANCE-LAPTOP)  
-- Output key metadata for investigation
+- Flag events where users or hosts appear suspicious  
+- Display key metadata like username, host, and assigned privileges
 
 <details>
 <summary>View Windows Rule 3 Screenshots</summary>
