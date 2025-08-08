@@ -35,11 +35,16 @@ This section showcases detection rules written in Python using Jupyter notebooks
 | 2 | [Planned] Repeated DNS queries to suspicious domains within short intervals |
 | 3 | [Planned] DNS exfiltration pattern detection via encoded subdomains |
 
+---
+
+### Rule 1 – Suspicious DNS Query Detection  
+This rule flags unusual domain requests that resemble command-and-control behaviour. It focuses on randomised strings, strange TLDs, and failed DNS resolutions — a pattern common in malware beaconing.
+
 <details>
-<summary>Rule 1 – Suspicious DNS Query Detection</summary>
+<summary>See how this rule works, why it matters, and what it looks like in action</summary>
 
 **Analyst Note:**  
-I wanted this rule to flag potential beaconing or command-and-control activity — but not every weird-looking domain is malicious. I fine-tuned the logic to catch base64-style strings and odd TLDs like `.ru` or `.xyz`, then filtered for failed lookups like `NXDOMAIN` to reduce false positives. The goal was to simulate how a SOC analyst would cut through noisy DNS logs.
+I wanted this rule to flag potential beaconing or command-and-control activity, but not every strange-looking domain is malicious. I used regex to match domains that resembled base64 or randomised strings, then filtered for uncommon TLDs like `.ru` or `.xyz`. To reduce noise, I added a check for DNS response codes like `NXDOMAIN` and `SERVFAIL`, which often appear in failed malware lookups. This helped me practise fine-tuning detection rules to balance coverage and precision.
 
 **Framework Reference:**  
 - **MITRE ATT&CK T1071.004** – Application Layer Protocol: DNS  
@@ -47,9 +52,9 @@ I wanted this rule to flag potential beaconing or command-and-control activity �
 - **CIS Control 13.8** – Monitor and alert on anomalous DNS activity
 
 **Logic Summary:**
-- Match encoded subdomains using regex
-- Flag risky TLDs (e.g. `.ru`, `.xyz`)
-- Filter for failed responses to catch dead or malicious lookups
+- Use regex to identify encoded or random-looking domains  
+- Match against high-risk TLDs  
+- Filter for DNS failures such as `NXDOMAIN` and `SERVFAIL`
 
 <details>
 <summary>View DNS Rule 1 Screenshots</summary>
@@ -69,6 +74,7 @@ _Suspicious Queries (Part 2)_
 </details>
 
 ---
+
 
 <details>
 <summary><strong>Windows Log Detections</strong> — <em>Data Source: windows_logs.csv</em></summary>
@@ -254,9 +260,11 @@ _Add screenshot: `auth_rule3_success_after_fail.png`_
 </details>
 
 
-## 6. Splunk Cloud SIEM (Phase 2)
+---
 
-This next stage will mirror all detection logic in Splunk Cloud, allowing for:
+## 6. Splunk SIEM (Phase 2)
+
+This next stage will mirror all detection logic in Splunk,  allowing for:
 - SIEM-style alerting and dashboard creation
 - Field extraction and log tagging
 - Hands-on experience with SPL (Search Processing Language)
