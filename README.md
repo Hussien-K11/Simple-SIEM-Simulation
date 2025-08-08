@@ -190,9 +190,6 @@ _Detection Output_
 </details>
 
 ---
-
----
-
 <details>
 <summary><strong>Authentication Log Detections</strong> — <em>Data Source: auth_logs.csv</em></summary>
 
@@ -204,23 +201,23 @@ _Detection Output_
 
 ---
 
-### Rule 1 – Brute-Force Login Detection  
-This rule catches vertical brute-force attacks, where a single IP repeatedly attempts to log in within a short window. It reflects a high-confidence pattern that most SOCs monitor closely.
+### Rule 1 – Brute-Force Login Attempts (Vertical Attack)  
+Multiple failed login attempts from the same IP in a short window often indicate brute-force activity. This detection highlights that behaviour before an attacker gains access.
 
 <details>
 <summary>See how this rule works, why it matters, and what it looks like in action</summary>
 
 **Analyst Note:**  
-This was the first detection I built for this project. I grouped failed logins by IP address within a one-minute window, simulating how SIEM tools like Splunk or Sentinel handle brute-force detection. I tested multiple thresholds before settling on five attempts in 60 seconds, which felt realistic for spotting early-stage attacks without flooding the SOC with false positives.
+This was the first authentication detection I developed. I simulated vertical brute-force behaviour — one IP repeatedly failing to log in — and tuned it to trigger only when five or more failures happened within 60 seconds. I tested different time windows before settling on this threshold, which felt aggressive enough for early detection without overwhelming the analyst. This rule taught me how to group login attempts and control alert sensitivity using timestamp logic.
 
 **Framework Reference:**  
-- **MITRE ATT&CK T1110.001** – Brute Force  
+- **MITRE ATT&CK T1110.001** – Password Guessing  
 - **NIST CSF DE.AE-3**, **CIS Control 16.11** – Detect excessive failed authentication attempts
 
 **Logic Summary:**
-- Filter logins with status ‘FAIL’  
-- Group by source IP and sort chronologically  
-- Alert if 5 or more attempts occur in under 60 seconds
+- Filter logs with status `'FAIL'`  
+- Group by source IP  
+- Sort by time and alert if five or more failures occur within 60 seconds
 
 <details>
 <summary>View Authentication Rule 1 Screenshots</summary>
@@ -232,14 +229,14 @@ _Add screenshot: `auth_rule1_bruteforce_output.png`_
 
 ---
 
-### Rule 2 – Password Spraying Detection  
-Unlike brute-force attacks, this rule detects horizontal attempts where many usernames are targeted from a single IP. It reflects stealthier behaviour designed to avoid account lockouts.
+### Rule 2 – Password Spraying Detection (Horizontal Attack)  
+When attackers try many usernames with one password from a single IP, they often avoid account lockouts. This rule detects that pattern early by tracking unique usernames per source.
 
 <details>
 <summary>See how this rule works, why it matters, and what it looks like in action</summary>
 
 **Analyst Note:**  
-I designed this rule to detect password spraying, which avoids triggering lockouts by spreading login attempts across multiple usernames. It required a shift in thinking compared to Rule 1. Instead of counting raw login failures, I focused on unique usernames within a 60-second period. This helped me practise recognising slower, stealthier attacks that are easy to miss.
+Unlike vertical brute-force attacks, password spraying takes a broader approach. I had to shift my thinking from volume to variety — looking at how many **different** usernames an IP tries. I grouped logs by IP, counted the number of unique usernames per minute, and flagged anything that crossed the threshold. This rule helped me practise how a SOC analyst might detect low-noise attacks that try to stay under the radar.
 
 **Framework Reference:**  
 - **MITRE ATT&CK T1110.003** – Password Spraying  
@@ -247,8 +244,8 @@ I designed this rule to detect password spraying, which avoids triggering lockou
 
 **Logic Summary:**
 - Group events by source IP  
-- Count distinct usernames per IP within 60 seconds  
-- Alert when five or more usernames are targeted
+- Count unique usernames within a 60-second window  
+- Trigger alert if five or more usernames are targeted
 
 <details>
 <summary>View Authentication Rule 2 Screenshots</summary>
@@ -260,23 +257,23 @@ _Add screenshot: `auth_rule2_passwordspray_output.png`_
 
 ---
 
-### Rule 3 – Success After Failures  
-This rule identifies a successful login that follows a burst of failed attempts from the same IP. It’s a strong signal of potential compromise, often missed unless correlation is applied.
+### Rule 3 – Success After Failures (Potential Compromise)  
+An attacker who guesses the right credentials after multiple failures often goes unnoticed. This rule surfaces that risky pattern by correlating successful logins with recent failed attempts.
 
 <details>
 <summary>See how this rule works, why it matters, and what it looks like in action</summary>
 
 **Analyst Note:**  
-This was the most insightful rule to build. It models a realistic compromise where an attacker guesses the right credentials after a series of failed attempts. I used a 10-minute time window to link successful logins with recent failures from the same IP. It helped me understand how context-aware detection can uncover threats traditional tools might miss.
+This rule models one of the most dangerous scenarios — a successful login that follows multiple failed attempts from the same IP. I wrote logic to correlate login events over a 10-minute period, linking a success with three or more earlier failures. It taught me how to model sequence-based detections and why context matters. This type of detection often gets missed unless a SOC has correlation logic in place.
 
 **Framework Reference:**  
 - **MITRE ATT&CK T1078.004** – Valid Accounts: Cloud Accounts  
-- **NIST SP 800-61 Step 2.4**, **CIS Control 16.13** – Monitor successful authentication after repeated failure
+- **NIST SP 800-61 Step 2.4**, **CIS Control 16.13** – Detect successful authentication after failed attempts
 
 **Logic Summary:**
-- Detect successful login attempts  
-- Correlate with prior failed attempts from the same IP  
-- Trigger if three or more failures occurred in the last 10 minutes
+- Identify successful login events  
+- Check for three or more failures from the same IP within the past 10 minutes  
+- Flag those sessions for deeper review
 
 <details>
 <summary>View Authentication Rule 3 Screenshots</summary>
@@ -288,6 +285,7 @@ _Add screenshot: `auth_rule3_success_after_fail.png`_
 
 </details>
 
+---
 ---
 
 ## 6. Splunk SIEM (Phase 2)
