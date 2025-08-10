@@ -105,6 +105,36 @@ _Detection Output_
 </details>
 </details>
 
+### Rule 3 – DNS Exfiltration Pattern Detection  
+This rule detects potential data exfiltration attempts over DNS, where attackers encode sensitive data into subdomains and send it out via repeated queries. While not common in normal business traffic, when it happens, it’s a serious indicator of compromise.
+
+<details>
+<summary>See how this rule works, why it matters, and what it looks like in action</summary>
+
+**Analyst Note:**  
+I designed this rule to flag unusual DNS patterns that could indicate exfiltration. Attackers often base64-encode chunks of stolen data into subdomain labels, sending them in rapid succession to a domain they control. My approach combined regex checks for base64-style strings with frequency analysis, looking for multiple encoded subdomains queried in a short period. Even though my sample dataset didn’t trigger this rule, building it gave me experience in crafting logic for high-impact, low-frequency threats.
+
+**Framework Reference:**  
+- **MITRE ATT&CK T1048.003** – Exfiltration Over Unencrypted Non-C2 Protocol: DNS  
+- **NIST CSF DE.AE-3**, **NIST SP 800-92** – Detect anomalous DNS query patterns  
+- **CIS Control 13.8** – Monitor and alert on anomalous DNS activity
+
+**Logic Summary:**
+- Match subdomains against regex patterns resembling base64 or other encoding schemes  
+- Group by queried domain and source IP  
+- Flag if multiple encoded subdomains appear within 60 seconds
+
+<details>
+<summary>View DNS Rule 3 Screenshots</summary>
+
+_Detection Logic_  
+![Logic](screenshots/jupyter/dns/dns_rule3_exfiltration_logic.png)
+
+_Detection Output_  
+![Output](screenshots/jupyter/dns/dns_rule3_exfiltration_output.png)
+
+</details>
+</details>
 
 
 
