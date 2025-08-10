@@ -72,6 +72,42 @@ _Suspicious Queries (Part 2)_
 </details>
 </details>
 
+
+
+### Rule 2 – Repeated DNS Queries to Suspicious Domains  
+This rule spots repeated queries to the same high-risk domain within a short time frame, which is often a sign of beaconing or malware callbacks.
+
+<details>
+<summary>See how this rule works, why it matters, and what it looks like in action</summary>
+
+**Analyst Note:**  
+I built this rule to catch repeated DNS lookups that stand out in short bursts. Even if the domain isn’t overtly malicious, abnormal query patterns can signal early-stage command-and-control activity. I combined risky keyword checks with a rolling 60-second window to surface repeated activity without triggering on normal browsing behaviour.
+
+**Framework Reference:**  
+- **MITRE ATT&CK T1071.004** – Application Layer Protocol: DNS  
+- **NIST CSF DE.AE-3**, **NIST SP 800-92** – Detect anomalies in query frequency  
+- **CIS Control 13.8** – Monitor and alert on anomalous DNS activity
+
+**Logic Summary:**
+- Identify domains containing risky keywords or failed resolution codes  
+- Group queries by domain  
+- Flag if the same domain is queried more than three times in 60 seconds
+
+<details>
+<summary>View DNS Rule 2 Screenshots</summary>
+
+_Detection Logic_  
+![Logic](screenshots/jupyter/dns/dns_rule2_repeated_queries_logic.png)
+
+_Detection Output_  
+![Output](screenshots/jupyter/dns/dns_rule2_repeated_queries_output.png)
+
+</details>
+</details>
+
+
+
+
 </details>
 
 ---
