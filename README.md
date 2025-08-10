@@ -274,7 +274,7 @@ Multiple failed login attempts from the same IP in a short window often indicate
 <summary>See how this rule works, why it matters, and what it looks like in action</summary>
 
 **Analyst Note:**  
-This was the first authentication detection I developed. I simulated vertical brute-force behaviour — one IP repeatedly failing to log in — and tuned it to trigger only when five or more failures happened within 60 seconds. I tested different time windows before settling on this threshold, which felt aggressive enough for early detection without overwhelming the analyst. This rule taught me how to group login attempts and control alert sensitivity using timestamp logic.
+This was the first authentication detection I developed. I simulated vertical brute-force behaviour, one IP repeatedly failing to log in, and tuned it to trigger only when five or more failures happened within 60 seconds. I tested different time windows before settling on this threshold, which felt aggressive enough for early detection without overwhelming the analyst. This rule taught me how to group login attempts and control alert sensitivity using timestamp logic.
 
 **Framework Reference:**  
 - **MITRE ATT&CK T1110.001** – Password Guessing  
@@ -288,7 +288,8 @@ This was the first authentication detection I developed. I simulated vertical br
 <details>
 <summary>View Authentication Rule 1 Screenshots</summary>
 
-_Add screenshot: `auth_rule1_bruteforce_output.png`_
+![Authentication Rule 1 Logic](screenshots/jupyter/auth/auth_rule1_bruteforce_logic.png)  
+![Authentication Rule 1 Output](screenshots/jupyter/auth/auth_rule1_bruteforce_output.png)
 
 </details>
 </details>
@@ -302,7 +303,7 @@ When attackers try many usernames with one password from a single IP, they often
 <summary>See how this rule works, why it matters, and what it looks like in action</summary>
 
 **Analyst Note:**  
-Unlike vertical brute-force attacks, password spraying takes a broader approach. I had to shift my thinking from volume to variety — looking at how many **different** usernames an IP tries. I grouped logs by IP, counted the number of unique usernames per minute, and flagged anything that crossed the threshold. This rule helped me practise how a SOC analyst might detect low-noise attacks that try to stay under the radar.
+Unlike vertical brute-force attacks, password spraying takes a broader approach. I had to shift my thinking from volume to variety, looking at how many **different** usernames an IP tries. I grouped logs by IP, counted the number of unique usernames per minute, and flagged anything that crossed the threshold. This rule helped me practise how a SOC analyst might detect low-noise attacks that try to stay under the radar.
 
 **Framework Reference:**  
 - **MITRE ATT&CK T1110.003** – Password Spraying  
@@ -316,7 +317,8 @@ Unlike vertical brute-force attacks, password spraying takes a broader approach.
 <details>
 <summary>View Authentication Rule 2 Screenshots</summary>
 
-_Add screenshot: `auth_rule2_passwordspray_output.png`_
+![Authentication Rule 2 Logic](screenshots/jupyter/auth/auth_rule2_passwordspray_logic.png)  
+![Authentication Rule 2 Output](screenshots/jupyter/auth/auth_rule2_passwordspray_output.png)
 
 </details>
 </details>
@@ -330,7 +332,7 @@ An attacker who guesses the right credentials after multiple failures often goes
 <summary>See how this rule works, why it matters, and what it looks like in action</summary>
 
 **Analyst Note:**  
-This rule models one of the most dangerous scenarios — a successful login that follows multiple failed attempts from the same IP. I wrote logic to correlate login events over a 10-minute period, linking a success with three or more earlier failures. It taught me how to model sequence-based detections and why context matters. This type of detection often gets missed unless a SOC has correlation logic in place.
+This rule models one of the most dangerous scenarios, a successful login that follows multiple failed attempts from the same IP. I wrote logic to correlate login events over a 10-minute period, linking a success with three or more earlier failures. It taught me how to model sequence-based detections and why context matters. This type of detection often gets missed unless a SOC has correlation logic in place.
 
 **Framework Reference:**  
 - **MITRE ATT&CK T1078.004** – Valid Accounts: Cloud Accounts  
@@ -344,12 +346,14 @@ This rule models one of the most dangerous scenarios — a successful login that
 <details>
 <summary>View Authentication Rule 3 Screenshots</summary>
 
-_Add screenshot: `auth_rule3_success_after_fail.png`_
+![Authentication Rule 3 Logic](screenshots/jupyter/auth/auth_rule3_success_after_fail_logic.png)  
+![Authentication Rule 3 Output](screenshots/jupyter/auth/auth_rule3_success_after_fail_output.png)
 
 </details>
 </details>
 
 </details>
+
 
 ---
 ---
