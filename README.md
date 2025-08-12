@@ -276,6 +276,12 @@ Multiple failed login attempts from the same IP in a short window often indicate
 **Analyst Note:**  
 This was the first authentication detection I developed. I simulated vertical brute-force behaviour, one IP repeatedly failing to log in, and tuned it to trigger only when five or more failures happened within 60 seconds. I tested different time windows before settling on this threshold, which felt aggressive enough for early detection without overwhelming the analyst. This rule taught me how to group login attempts and control alert sensitivity using timestamp logic.
 
+**Operational Use Case:**  
+Designed for early detection of brute-force login attempts before credentials are compromised. Particularly useful for monitoring public-facing services, VPN gateways, and admin portals.  
+
+**Test Data Notes:**  
+Test data shows the rule correctly did not fire on clean logs. A synthetic IOC was injected to demonstrate detection.  
+
 **Framework Reference:**  
 - **MITRE ATT&CK T1110.001** – Password Guessing  
 - **NIST CSF DE.AE-3**, **CIS Control 16.11** – Detect excessive failed authentication attempts
@@ -288,11 +294,18 @@ This was the first authentication detection I developed. I simulated vertical br
 <details>
 <summary>View Authentication Rule 1 Screenshots</summary>
 
+_Logic (Original Detection)_  
 ![Authentication Rule 1 Logic](screenshots/jupyter/auth/auth_rule1_bruteforce_logic.png)  
-![Authentication Rule 1 Output](screenshots/jupyter/auth/auth_rule1_bruteforce_output.png)
+
+_Output (Clean Logs – No Detection)_  
+![Authentication Rule 1 Output](screenshots/jupyter/auth/auth_rule1_bruteforce_output.png)  
+
+_Output (Synthetic IOC Injected – Detection Triggered)_  
+![Authentication Rule 1 IOC Output](screenshots/jupyter/auth/auth_rule1_bruteforce_output_ioc.png)  
 
 </details>
 </details>
+
 
 ---
 
