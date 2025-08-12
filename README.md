@@ -356,7 +356,12 @@ An attacker who guesses the right credentials after multiple failures often goes
 <summary>See how this rule works, why it matters, and what it looks like in action</summary>
 
 **Analyst Note:**  
-This rule models one of the most dangerous scenarios, a successful login that follows multiple failed attempts from the same IP. I wrote logic to correlate login events over a 10-minute period, linking a success with three or more earlier failures. It taught me how to model sequence-based detections and why context matters. This type of detection often gets missed unless a SOC has correlation logic in place.
+This rule models one of the most dangerous scenarios — a successful login that follows multiple failed attempts from the same IP. I wrote logic to correlate login events over a 10-minute period, linking a success with three or more earlier failures. It taught me how to model sequence-based detections and why context matters. This type of detection often gets missed unless a SOC has correlation logic in place.
+
+For validation, I ran the rule on both clean and synthetic test data. Test data shows the rule correctly did not fire on clean logs. Synthetic IOC data was then injected to demonstrate that the detection triggers as intended.
+
+**Operational Use Case:**  
+In a real SOC, this detection is critical for spotting compromised accounts before an attacker can escalate privileges or move laterally. While failed logins alone may be dismissed as user error, linking them with a later success is a strong indicator of credential compromise. This rule would typically feed into an alert with high severity, prompting immediate account lockout and incident response.
 
 **Framework Reference:**  
 - **MITRE ATT&CK T1078.004** – Valid Accounts: Cloud Accounts  
@@ -370,11 +375,16 @@ This rule models one of the most dangerous scenarios, a successful login that fo
 <details>
 <summary>View Authentication Rule 3 Screenshots</summary>
 
+_Clean Dataset Logic & Output_  
 ![Authentication Rule 3 Logic](screenshots/jupyter/auth/auth_rule3_success_after_fail_logic.png)  
-![Authentication Rule 3 Output](screenshots/jupyter/auth/auth_rule3_success_after_fail_output.png)
+![Authentication Rule 3 Output](screenshots/jupyter/auth/auth_rule3_success_after_fail_output.png)  
+
+_Synthetic IOC Test Output_  
+![Authentication Rule 3 IOC Output](screenshots/jupyter/auth/auth_rule3_success_after_fail_output_ioc.png)
 
 </details>
 </details>
+
 
 </details>
 
