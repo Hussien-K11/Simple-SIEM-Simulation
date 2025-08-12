@@ -274,20 +274,22 @@ Multiple failed login attempts from the same IP in a short window often indicate
 <summary>See how this rule works, why it matters, and what it looks like in action</summary>
 
 **Analyst Note:**  
-This was the first authentication detection I developed. I simulated vertical brute-force behaviour, one IP repeatedly failing to log in, and tuned it to trigger only when five or more failures happened within 60 seconds. I tested different time windows before settling on this threshold, which felt aggressive enough for early detection without overwhelming the analyst. This rule taught me how to group login attempts and control alert sensitivity using timestamp logic.
+This was the first authentication detection I developed. I simulated vertical brute-force behaviour (one IP repeatedly failing to log in) and tuned it to trigger only when five or more failures happened within 60 seconds. I tested different time windows before settling on this threshold, which felt aggressive enough for early detection without overwhelming the analyst.  
+This rule taught me how to group login attempts and control alert sensitivity using timestamp logic.
 
 **Operational Use Case:**  
-Designed for early detection of brute-force login attempts before credentials are compromised. Particularly useful for monitoring public-facing services, VPN gateways, and admin portals.  
+Designed for early detection of brute-force login attempts before credentials are compromised. Particularly useful for monitoring public-facing services, VPN gateways, and admin portals.
 
 **Test Data Notes:**  
-Test data shows the rule correctly did not fire on clean logs. A synthetic IOC was injected to demonstrate detection.  
+- Clean logs: **No alert triggered**.  
+- IOC injected: **Alert fired**, confirming correct detection.
 
 **Framework Reference:**  
 - **MITRE ATT&CK T1110.001** – Password Guessing  
 - **NIST CSF DE.AE-3**, **CIS Control 16.11** – Detect excessive failed authentication attempts
 
 **Logic Summary:**
-- Filter logs with status `'FAIL'`  
+- Filter logs with status `'FAIL'`
 - Group by source IP  
 - Sort by time and alert if five or more failures occur within 60 seconds
 
@@ -306,7 +308,6 @@ _Output (Synthetic IOC Injected – Detection Triggered)_
 </details>
 </details>
 
-
 ---
 
 ### Rule 2 – Password Spraying Detection (Horizontal Attack)  
@@ -316,77 +317,89 @@ When attackers try many usernames with one password from a single IP, they often
 <summary>See how this rule works, why it matters, and what it looks like in action</summary>
 
 **Analyst Note:**  
-Unlike vertical brute-force attacks, password spraying takes a broader approach. I shifted my perspective from volume to variety—how many **different** usernames an IP tries in a short burst. I used a 60‑second sliding window per IP and flagged attempts where ≥5 distinct usernames were targeted. I validated both failure and success paths with synthetic test data.
+Unlike vertical brute-force attacks, password spraying takes a broader approach. I shifted my perspective from **volume** to **variety**—how many **different** usernames an IP tries in a short burst.  
+I used a 60-second sliding window per IP and flagged attempts where ≥5 distinct usernames were targeted.  
+I validated both failure and success paths with synthetic test data.
+
+**Operational Use Case:**  
+Effective for detecting slow-and-low password spraying attacks that bypass account lockout policies. Works well for large enterprise Active Directory environments, SaaS logins, and VPN authentication endpoints.
 
 **Framework Reference:**  
 - **MITRE ATT&CK T1110.003** – Password Spraying  
 - **CIS Control 16.12** – Detect excessive username attempts from a single source
 
 **Logic Summary:**
-- Group login attempts by `source_ip`
-- For each attempt, look ahead 60 seconds (sliding window)
-- Count **unique** usernames in that window
+- Group login attempts by `source_ip`  
+- For each attempt, look ahead 60 seconds (sliding window)  
+- Count **unique** usernames in that window  
 - Alert if the count ≥ 5
 
 **Test Outcome:**
--  Clean dataset: **No alert** (rule did not fire on normal traffic)
--  IOC injected: **Alert triggered** for 5 usernames in 60 seconds
+- Clean dataset: **No alert** (rule did not fire on normal traffic)  
+- IOC injected: **Alert triggered** for 5 usernames in 60 seconds
 
 <details>
 <summary>View Authentication Rule 2 Screenshots</summary>
 
 _Logic (with clean run)_  
-![Logic](screenshots/jupyter/auth/auth_rule2_passwordspray_logic.png)
+![Logic](screenshots/jupyter/auth/auth_rule2_passwordspray_logic.png)  
 
 _Clean dataset output_  
-![Clean Output](screenshots/jupyter/auth/auth_rule2_passwordspray_output_clean.png)
+![Clean Output](screenshots/jupyter/auth/auth_rule2_passwordspray_output.png)  
 
 _Synthetic IOC output (alert)_  
-![IOC Output](screenshots/jupyter/auth/auth_rule2_passwordspray_output_ioc.png)
+![IOC Output](screenshots/jupyter/auth/auth_rule2_passwordspray_output_ioc.png)  
 
 </details>
 </details>
 
 ---
 
-### Rule 3 – Success After Failures (Potential Compromise)  
-An attacker who guesses the right credentials after multiple failures often goes unnoticed. This rule surfaces that risky pattern by correlating successful logins with recent failed attempts.
+### Rule 3 – Success After Multiple Failures (Suspicious Login Pattern)  
+A successful login immediately following multiple failures can indicate a brute-force or password guessing attack that has just succeeded.
 
 <details>
 <summary>See how this rule works, why it matters, and what it looks like in action</summary>
 
 **Analyst Note:**  
-This rule models one of the most dangerous scenarios — a successful login that follows multiple failed attempts from the same IP. I wrote logic to correlate login events over a 10-minute period, linking a success with three or more earlier failures. It taught me how to model sequence-based detections and why context matters. This type of detection often gets missed unless a SOC has correlation logic in place.
-
-For validation, I ran the rule on both clean and synthetic test data. Test data shows the rule correctly did not fire on clean logs. Synthetic IOC data was then injected to demonstrate that the detection triggers as intended.
+This rule looks for a “fail → fail → fail → success” sequence within 10 minutes from the same IP.  
+It’s designed to detect situations where attackers eventually guess the correct password, gain access, and potentially escalate privileges.  
+I simulated this by creating multiple failed attempts followed by a successful login in the test dataset.
 
 **Operational Use Case:**  
-In a real SOC, this detection is critical for spotting compromised accounts before an attacker can escalate privileges or move laterally. While failed logins alone may be dismissed as user error, linking them with a later success is a strong indicator of credential compromise. This rule would typically feed into an alert with high severity, prompting immediate account lockout and incident response.
+Critical for post-authentication monitoring. Detecting this pattern helps analysts quickly respond to compromised accounts, even if the initial attack was missed.
 
 **Framework Reference:**  
-- **MITRE ATT&CK T1078.004** – Valid Accounts: Cloud Accounts  
-- **NIST SP 800-61 Step 2.4**, **CIS Control 16.13** – Detect successful authentication after failed attempts
+- **MITRE ATT&CK T1078** – Valid Accounts  
+- **NIST CSF DE.AE-5** – Detect successful login anomalies after failures  
+- **CIS Control 16.14** – Detect successful logins following failed attempts
 
 **Logic Summary:**
-- Identify successful login events  
-- Check for three or more failures from the same IP within the past 10 minutes  
-- Flag those sessions for deeper review
+- Identify IPs with at least one successful login  
+- Look backwards to find failed logins from the same IP within 10 minutes  
+- Trigger alert if ≥3 failures occurred before the success
+
+**Test Outcome:**
+- Clean dataset: **No alert triggered**  
+- IOC injected: **Alert fired** showing attacker IP, username, fail count, and timestamps
 
 <details>
 <summary>View Authentication Rule 3 Screenshots</summary>
 
-_Clean Dataset Logic & Output_  
+_Logic (Original Detection)_  
 ![Authentication Rule 3 Logic](screenshots/jupyter/auth/auth_rule3_success_after_fail_logic.png)  
+
+_Output (Clean Logs – No Detection)_  
 ![Authentication Rule 3 Output](screenshots/jupyter/auth/auth_rule3_success_after_fail_output.png)  
 
-_Synthetic IOC Test Output_  
-![Authentication Rule 3 IOC Output](screenshots/jupyter/auth/auth_rule3_success_after_fail_output_ioc.png)
+_Output (Synthetic IOC Injected – Detection Triggered)_  
+![Authentication Rule 3 IOC Output](screenshots/jupyter/auth/auth_rule3_success_after_fail_output_ioc.png)  
 
 </details>
 </details>
 
-
 </details>
+
 
 
 ---
