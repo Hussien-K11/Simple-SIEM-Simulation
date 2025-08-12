@@ -316,22 +316,33 @@ When attackers try many usernames with one password from a single IP, they often
 <summary>See how this rule works, why it matters, and what it looks like in action</summary>
 
 **Analyst Note:**  
-Unlike vertical brute-force attacks, password spraying takes a broader approach. I had to shift my thinking from volume to variety, looking at how many **different** usernames an IP tries. I grouped logs by IP, counted the number of unique usernames per minute, and flagged anything that crossed the threshold. This rule helped me practise how a SOC analyst might detect low-noise attacks that try to stay under the radar.
+Unlike vertical brute-force attacks, password spraying takes a broader approach. I shifted my perspective from volume to variety—how many **different** usernames an IP tries in a short burst. I used a 60‑second sliding window per IP and flagged attempts where ≥5 distinct usernames were targeted. I validated both failure and success paths with synthetic test data.
 
 **Framework Reference:**  
 - **MITRE ATT&CK T1110.003** – Password Spraying  
 - **CIS Control 16.12** – Detect excessive username attempts from a single source
 
 **Logic Summary:**
-- Group events by source IP  
-- Count unique usernames within a 60-second window  
-- Trigger alert if five or more usernames are targeted
+- Group login attempts by `source_ip`
+- For each attempt, look ahead 60 seconds (sliding window)
+- Count **unique** usernames in that window
+- Alert if the count ≥ 5
+
+**Test Outcome:**
+-  Clean dataset: **No alert** (rule did not fire on normal traffic)
+-  IOC injected: **Alert triggered** for 5 usernames in 60 seconds
 
 <details>
 <summary>View Authentication Rule 2 Screenshots</summary>
 
-![Authentication Rule 2 Logic](screenshots/jupyter/auth/auth_rule2_passwordspray_logic.png)  
-![Authentication Rule 2 Output](screenshots/jupyter/auth/auth_rule2_passwordspray_output.png)
+_Logic (with clean run)_  
+![Logic](screenshots/jupyter/auth/auth_rule2_passwordspray_logic.png)
+
+_Clean dataset output_  
+![Clean Output](screenshots/jupyter/auth/auth_rule2_passwordspray_output_clean.png)
+
+_Synthetic IOC output (alert)_  
+![IOC Output](screenshots/jupyter/auth/auth_rule2_passwordspray_output_ioc.png)
 
 </details>
 </details>
