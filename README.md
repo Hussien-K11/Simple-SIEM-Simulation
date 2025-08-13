@@ -161,7 +161,10 @@ Some phishing payloads abuse trusted parent apps like Word or Explorer to silent
 <summary>See how this rule works, why it matters, and what it looks like in action</summary>
 
 **Analyst Note:**  
-This detection was based on real attack patterns I’ve studied, where phishing attachments trigger PowerShell from Word or Outlook. My log source didn’t include the `parent_process` field, so I simulated it using synthetic test data. I then wrote logic to catch trusted parent apps launching suspicious child processes like `powershell.exe`, `cmd.exe`, or `certutil.exe`. This helped me understand how process lineage can expose attacker behaviour that would otherwise slip past basic IOC matching.
+This detection was based on real attack patterns I’ve studied, where phishing attachments trigger PowerShell from Word or Outlook. My log source didn’t include the `parent_process` field, so I simulated it using synthetic test data during the dataset creation phase. I then wrote logic to catch trusted parent apps launching suspicious child processes like `powershell.exe`, `cmd.exe`, or `certutil.exe`. This helped me understand how process lineage can expose attacker behaviour that would otherwise slip past basic IOC matching.
+
+**Operational Use Case:**  
+Ideal for detecting living-off-the-land techniques where attackers leverage trusted applications to launch malicious code. Can be applied to endpoint detection telemetry in real SOC environments.
 
 **Framework Reference:**  
 - **MITRE ATT&CK T1059** – Command and Scripting Interpreter  
@@ -177,17 +180,16 @@ This detection was based on real attack patterns I’ve studied, where phishing 
 <summary>View Windows Rule 1 Screenshots</summary>
 
 _Preview of Raw Windows Logs_  
-![Preview](screenshots/jupyter/windows/windows_logs_preview.png)
+![Preview](screenshots/jupyter/windows/windows_logs_preview.png)  
 
 _Detection Logic_  
-![Logic](screenshots/jupyter/windows/windows_rule1_logic.png)
+![Logic](screenshots/jupyter/windows/windows_rule1_logic.png)  
 
-_Detection Output_  
-![Output](screenshots/jupyter/windows/windows_rule1_output.png)
+_Detection Output (Detection Triggered)_  
+![Output](screenshots/jupyter/windows/windows_rule1_output.png)  
 
 </details>
 </details>
-
 
 ---
 
@@ -199,6 +201,12 @@ Attackers often attempt password guessing by repeatedly submitting incorrect cre
 
 **Analyst Note:**  
 I built this rule to simulate brute-force login detection using Event ID 4625. I tested several thresholds and decided that five failures in two minutes was aggressive enough to catch real threats without overwhelming the SOC with noise. It taught me how to group events by host and time to simulate basic correlation — a key skill in detection engineering and alert tuning.
+
+**Operational Use Case:**  
+Helps SOC analysts detect brute-force attempts against Windows systems, especially in RDP or SMB login scenarios.
+
+**Test Data Notes:**  
+Test data shows the rule correctly did not fire on clean logs. A synthetic IOC was injected to demonstrate detection.
 
 **Framework Reference:**  
 - **MITRE ATT&CK T1110.001** – Password Guessing  
@@ -212,11 +220,14 @@ I built this rule to simulate brute-force login detection using Event ID 4625. I
 <details>
 <summary>View Windows Rule 2 Screenshots</summary>
 
-_Detection Logic_  
-![Logic](screenshots/jupyter/windows/windows_rule2_failed_logins_logic.png)
+_Detection Logic (Clean Run)_  
+![Logic](screenshots/jupyter/windows/windows_rule2_failed_logins_logic.png)  
 
-_Detection Output_  
-![Output](screenshots/jupyter/windows/windows_rule2_failed_logins_output.png)
+_Clean Dataset Output_  
+![Clean Output](screenshots/jupyter/windows/windows_rule2_failed_logins_output.png)  
+
+_Synthetic IOC Output (Alert Triggered)_  
+![IOC Output](screenshots/jupyter/windows/windows_rule2_failed_logins_output_ioc.png)  
 
 </details>
 </details>
@@ -232,6 +243,9 @@ Abusing admin privileges after gaining access is a common tactic in lateral move
 **Analyst Note:**  
 I designed this rule to detect high-privilege activity where it doesn't belong. Event ID 4672 logs special privilege assignments, so I used that as the foundation and filtered for low-trust usernames like `guest` or `svc_account`, along with hosts that typically shouldn't request elevated access. It helped me simulate real-world post-exploitation behaviour — and reinforced how valuable user and device context can be in detection logic.
 
+**Operational Use Case:**  
+Effective for catching privilege misuse after initial compromise. Particularly useful for detecting lateral movement or insider threats.
+
 **Framework Reference:**  
 - **MITRE ATT&CK T1078.003** – Valid Accounts: Local Accounts  
 - **NIST 800-61 Step 2.3**, **CIS Control 4.8** – Monitor for unusual privileged account activity
@@ -245,16 +259,17 @@ I designed this rule to detect high-privilege activity where it doesn't belong. 
 <summary>View Windows Rule 3 Screenshots</summary>
 
 _Detection Logic_  
-![Logic](screenshots/jupyter/windows/windows_rule3_privilege_escalation_logic.png)
+![Logic](screenshots/jupyter/windows/windows_rule3_privilege_escalation_logic.png)  
 
-_Detection Output_  
-![Output](screenshots/jupyter/windows/windows_rule3_privilege_escalation_output.png)
-
-</details>
-</details>
+_Detection Output (Detection Triggered)_  
+![Output](screenshots/jupyter/windows/windows_rule3_privilege_escalation_output.png)  
 
 </details>
+</details>
 
+</details>
+
+---
 ---
 <details>
 <summary><strong>Authentication Log Detections</strong> — <em>Data Source: auth_logs.csv</em></summary>
