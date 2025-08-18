@@ -123,24 +123,25 @@ _Preview of Injected Rows (stealer.cn)_
 
 
 
-### Rule 3 – DNS Exfiltration Pattern Detection  
-This rule detects potential data exfiltration attempts over DNS, where attackers encode sensitive data into subdomains and send it out via repeated queries. While not common in normal business traffic, when it happens, it’s a serious indicator of compromise.
+### Rule 3 – DNS Exfiltration via Encoded Subdomains  
+This rule detects possible DNS exfiltration attempts by looking for encoded subdomains that resemble base64 patterns — often used in C2 communications or data theft via DNS tunnelling.
 
 <details>
 <summary>See how this rule works, why it matters, and what it looks like in action</summary>
 
 **Analyst Note:**  
-I designed this rule to flag unusual DNS patterns that could indicate exfiltration. Attackers often base64-encode chunks of stolen data into subdomain labels, sending them in rapid succession to a domain they control. My approach combined regex checks for base64-style strings with frequency analysis, looking for multiple encoded subdomains queried in a short period. Even though my sample dataset didn’t trigger this rule, building it gave me experience in crafting logic for high-impact, low-frequency threats.
+This rule was designed to catch unusual subdomain patterns that indicate an attacker might be using DNS to sneak data out of a network. I focused on base64-style strings and hex-style indicators (long sequences of a–f or 0–9), which are both classic signs of encoded payloads. Instead of looking just at the main domain, I split subdomains and scanned for suspicious labels. The rule flagged multiple alerts in real log data, which is a solid indication that this technique works in real environments — no artificial IOC was needed.
 
 **Framework Reference:**  
-- **MITRE ATT&CK T1048.003** – Exfiltration Over Unencrypted Non-C2 Protocol: DNS  
-- **NIST CSF DE.AE-3**, **NIST SP 800-92** – Detect anomalous DNS query patterns  
-- **CIS Control 13.8** – Monitor and alert on anomalous DNS activity
+- **MITRE ATT&CK T1048.003** – Data Exfiltration over Unconventional Protocol: DNS  
+- **NIST CSF DE.CM-1**, **DE.AE-5**, **SP 800-92** – Detect abnormal subdomain activity  
+- **CIS Control 13.9** – Monitor DNS traffic for unusual patterns
 
 **Logic Summary:**
-- Match subdomains against regex patterns resembling base64 or other encoding schemes  
-- Group by queried domain and source IP  
-- Flag if multiple encoded subdomains appear within 60 seconds
+- Split queried domains into labels  
+- Use regex to detect base64-style (≥10 chars) or hex-style (≥20 hex digits) encodings  
+- Filter for failed DNS response codes to catch attempts that didn’t resolve normally  
+- Display alert rows, including the encoded label found
 
 <details>
 <summary>View DNS Rule 3 Screenshots</summary>
