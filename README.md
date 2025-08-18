@@ -26,84 +26,102 @@ This section showcases detection rules written in Python using Jupyter notebooks
 
 ---
 ---
-
 <details>
 <summary><strong>DNS Log Detections</strong> — <em>Data Source: dns_logs.csv</em></summary>
 
 | Rule # | Detection Description |
 |--------|------------------------|
 | 1 | Suspicious DNS queries to known-bad or randomised domains |
-| 2 | [Planned] Repeated DNS queries to suspicious domains within short intervals |
+| 2 | Repeated DNS queries to suspicious domains within short intervals |
 | 3 | [Planned] DNS exfiltration pattern detection via encoded subdomains |
 
 ---
 
 ### Rule 1 – Suspicious DNS Query Detection  
-This rule flags DNS traffic that resembles beaconing or C2 activity. It targets base64-style strings, shady top-level domains, and failed lookups that don’t belong in typical user traffic.
+This rule identifies DNS traffic that stands out as potentially malicious or beacon-like. It flags patterns such as unusual top-level domains (e.g. `.ru`, `.xyz`), base64-like random subdomains, and failed lookups (`NXDOMAIN`, `SERVFAIL`) that deviate from normal traffic.
 
 <details>
 <summary>See how this rule works, why it matters, and what it looks like in action</summary>
 
 **Analyst Note:**  
-I built this rule to detect domains that just don’t belong in regular business traffic. I was especially looking for signs of malware beaconing, like encoded strings in the subdomain or uncommon top-level domains such as `.ru` or `.xyz`. I added an extra filter to catch failed lookups (`NXDOMAIN`, `SERVFAIL`) to cut out noise from valid requests. This gave me hands-on practice designing logic that can reduce false positives while still catching high-risk patterns.
+I wrote this rule to surface DNS queries that just don't belong in typical enterprise traffic. Random-looking subdomains and uncommon TLDs are red flags in many attacks, especially when the queries fail. Adding a failure filter helped reduce false positives while keeping my detection focused on high-risk traffic.
 
 **Framework Reference:**  
 - **MITRE ATT&CK T1071.004** – Application Layer Protocol: DNS  
-- **NIST CSF DE.AE-3**, **NIST SP 800-92** – Detect anomalies via failed resolution patterns  
-- **CIS Control 13.8** – Monitor and alert on anomalous DNS activity
+- **NIST CSF DE.AE-3**, **NIST SP 800-92** – Identify anomalous DNS behaviour  
+- **CIS Control 13.8** – Detect and alert on DNS anomalies
 
 **Logic Summary:**
-- Use regex to detect base64-style or randomised subdomains  
-- Flag risky TLDs like `.ru`, `.xyz`, `.top`  
-- Filter for failed DNS response codes such as `NXDOMAIN` and `SERVFAIL`
+- Regex to match base64-style/randomised subdomains  
+- Flag TLDs like `.ru`, `.xyz`, `.top`  
+- Filter failed lookups (`NXDOMAIN`, `SERVFAIL`)
 
 <details>
 <summary>View DNS Rule 1 Screenshots</summary>
 
-_Preview of Raw DNS Logs_  
+_DNS Logs Preview_  
 ![Preview](screenshots/jupyter/dns/dns_logs_preview.png)
 
-_Suspicious Queries (Part 1)_  
-![Part 1](screenshots/jupyter/dns/dns_rule1_suspicious_queries(1).png)
+_Detection Logic_  
+![Logic](screenshots/jupyter/dns/dns_rule1_suspicious_queries_logic.png)
 
-_Suspicious Queries (Part 2)_  
-![Part 2](screenshots/jupyter/dns/dns_rule1_suspicious_queries(2).png)
+_Detection Output_  
+![Output](screenshots/jupyter/dns/dns_rule1_suspicious_queries_output.PNG)
 
 </details>
 </details>
 
-
+---
 
 ### Rule 2 – Repeated DNS Queries to Suspicious Domains  
-This rule spots repeated queries to the same high-risk domain within a short time frame, which is often a sign of beaconing or malware callbacks.
+This rule detects when a suspicious domain is queried repeatedly in a short period. This often indicates beaconing behaviour or malware checking in with a command-and-control server.
 
 <details>
 <summary>See how this rule works, why it matters, and what it looks like in action</summary>
 
 **Analyst Note:**  
-I built this rule to catch repeated DNS lookups that stand out in short bursts. Even if the domain isn’t overtly malicious, abnormal query patterns can signal early-stage command-and-control activity. I combined risky keyword checks with a rolling 60-second window to surface repeated activity without triggering on normal browsing behaviour.
+Even when a domain doesn’t look malicious on the surface, repeated lookups in a short time can be a strong signal. I combined domain heuristics with a rolling 60-second window to catch suspicious bursts of DNS activity. This gave me visibility into early beaconing behaviour without overfitting to static IOCs.
 
 **Framework Reference:**  
 - **MITRE ATT&CK T1071.004** – Application Layer Protocol: DNS  
-- **NIST CSF DE.AE-3**, **NIST SP 800-92** – Detect anomalies in query frequency  
-- **CIS Control 13.8** – Monitor and alert on anomalous DNS activity
+- **NIST SP 800-92** – Detect repeated or anomalous DNS resolution attempts  
+- **CIS Control 13.8** – Monitor DNS for beaconing or data exfiltration attempts
 
 **Logic Summary:**
-- Identify domains containing risky keywords or failed resolution codes  
-- Group queries by domain  
-- Flag if the same domain is queried more than three times in 60 seconds
+- Match domains with risky keywords or failed lookups  
+- Group by domain and source  
+- Flag if ≥3 queries occur within 60 seconds
 
 <details>
-<summary>View DNS Rule 2 Screenshots</summary>
+<summary>View DNS Rule 2 Screenshots (Clean Dataset)</summary>
 
-_Detection Logic_  
+_Detection Logic (Clean Run)_  
 ![Logic](screenshots/jupyter/dns/dns_rule2_repeated_queries_logic.png)
 
-_Detection Output_  
+_Logic Part 2_  
+![Logic 2](screenshots/jupyter/dns/dns_rule2_repeated_queries_logic_part2.PNG)
+
+_Detection Output (No IOC)_  
 ![Output](screenshots/jupyter/dns/dns_rule2_repeated_queries_output.png)
 
 </details>
+
+<details>
+<summary>View DNS Rule 2 Screenshots (After IOC Injection)</summary>
+
+_IOC Detection Logic_  
+![IOC Logic](screenshots/jupyter/dns/dns_rule2_repeated_queries_IOC_logic.PNG)
+
+_IOC Detection Output_  
+![IOC Output](screenshots/jupyter/dns/dns_rule2_repeated_queries_IOC_output.PNG)
+
+_Preview of Injected Rows (stealer.cn)_  
+![Preview](screenshots/jupyter/dns/dns_rule2_repeated_queries_IOC_output(2).PNG)
+
 </details>
+</details>
+
+
 
 ### Rule 3 – DNS Exfiltration Pattern Detection  
 This rule detects potential data exfiltration attempts over DNS, where attackers encode sensitive data into subdomains and send it out via repeated queries. While not common in normal business traffic, when it happens, it’s a serious indicator of compromise.
