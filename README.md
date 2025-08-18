@@ -17,12 +17,29 @@ The project reflects Tier 1 SOC responsibilities such as:
 | Phase      | Description                                          | Tools             |
 |------------|------------------------------------------------------|-------------------|
 | Phase 1    | Python-based detection logic and simulation          | Jupyter, pandas   |
-| Phase 2    | Detection logic replicated and tested in Splunk Cloud| Splunk Cloud, SPL |
+| Phase 2    | Detection logic replicated and tested in Splunk| Splunk, SPL |
 
 ---
 ## 3. Jupyter-Based Detection Logic
 
-This section showcases detection rules written in Python using Jupyter notebooks. Each rule is designed to reflect real-world SOC workflows: reviewing logs, applying logic, filtering out noise, and flagging suspicious behaviour. Every rule is aligned with adversary techniques from the MITRE ATT&CK framework, mapped to NIST CSF functions, and rooted in practical detection goals from CIS Controls.
+This section demonstrates hands-on detection logic written in Python and executed using Jupyter notebooks. Each rule simulates a realistic SOC analyst workflow:
+
+- Parsing and preparing DNS log data for analysis  
+- Applying detection logic using regular expressions, timestamp filtering, and field matching  
+- Identifying suspicious behaviour including failed lookups, beaconing, repeated queries, and potential data exfiltration  
+- Injecting Indicators of Compromise (IOCs) to validate the effectiveness of detection logic  
+
+These rules are developed to reflect real SOC operations and are structured to be readable, testable, and aligned with cybersecurity best practices.
+
+Each detection rule includes the following:
+
+- Alignment with the MITRE ATT&CK framework  
+- Mapping to NIST Cybersecurity Framework functions such as Detect and Respond  
+- Relevance to CIS Critical Security Controls  
+
+> **Analyst Note:**  
+> This section demonstrates manual detection engineering workflows that help build foundational understanding of how SIEM tools operate under the hood. Instead of relying on automated platforms, the logic here walks through how to write, test, and validate rules that simulate SOC detection use cases.
+
 
 ---
 ---
@@ -33,7 +50,7 @@ This section showcases detection rules written in Python using Jupyter notebooks
 |--------|------------------------|
 | 1 | Suspicious DNS queries to known-bad or randomised domains |
 | 2 | Repeated DNS queries to suspicious domains within short intervals |
-| 3 | [Planned] DNS exfiltration pattern detection via encoded subdomains |
+| 3 | DNS exfiltration pattern detection via encoded subdomains |
 
 ---
 
